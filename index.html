@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>BigJackson - 维基百科</title>
+  <link rel="icon" type="image/jpeg" href="/img/1.jpg">
   <style>
     body {
       font-family: "Linux Libertine", "Georgia", "Times New Roman", serif;
@@ -572,9 +573,17 @@
   // 6. 夜间模式切换
   const nightBtn = document.getElementById('nightModeBtn');
   nightBtn.addEventListener('click', () => {
-    document.body.classList.toggle('night-mode');
-    nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
+    const isNight = document.body.classList.toggle('night-mode');
+    nightBtn.textContent = isNight ? '日间模式' : '夜间模式';
+    localStorage.setItem('themeMode', isNight ? 'night' : 'day');
   });
+  // 记忆夜间/日间模式
+  // 初始化时读取localStorage
+  if (localStorage.getItem('themeMode') === 'night') {
+    document.body.classList.add('night-mode');
+    const nightBtn = document.getElementById('nightModeBtn');
+    if (nightBtn) nightBtn.textContent = '日间模式';
+  }
   </script>
 </body>
 </html>
