@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>BigJackson - 维基百科</title>
+  <style>
+    body {
+      font-family: "Linux Libertine", "Georgia", "Times New Roman", serif;
+      background-color: #f6f6f6;
+      margin: 0;
+      padding: 0;
+      color: #202122;
+    }
+    .mw-header {
+      background: #fff;
+      border-bottom: 1px solid #a2a9b1;
+      padding: 0.5em 2em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .mw-header .logo {
+      font-size: 1.5em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .mw-header .search {
+      flex: 1;
+      margin: 0 2em;
+      display: flex;
+      align-items: center;
+    }
+    .mw-header input[type="text"] {
+      width: 250px;
+      padding: 0.3em 0.7em;
+      border: 1px solid #a2a9b1;
+      border-radius: 2px;
+      font-size: 1em;
+    }
+    .mw-header .user {
+      font-size: 1em;
+      color: #555;
+    }
+    .mw-container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2em 1em 1em 1em;
+      min-height: 90vh;
+    }
+    .mw-sidebar {
+      width: 220px;
+      background: none;
+      padding-right: 1.5em;
+      font-size: 0.98em;
+      color: #222;
+    }
+    .mw-sidebar h3 {
+      font-size: 1.1em;
+      margin: 0.5em 0 0.2em 0;
+      font-weight: bold;
+      border-bottom: 1px solid #c8ccd1;
+      padding-bottom: 0.2em;
+    }
+    .mw-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1em 0;
+    }
+    .mw-sidebar li {
+      margin: 0.3em 0;
+    }
+    .mw-sidebar a {
+      color: #0645ad;
+      text-decoration: none;
+    }
+    .mw-sidebar a:hover {
+      text-decoration: underline;
+    }
+    .mw-content {
+      flex: 1;
+      background: #fff;
+      padding: 2em 2.5em 2em 2.5em;
+      box-shadow: 0 0 10px rgba(0,0,0,0.07);
+      border-radius: 2px;
+      min-width: 0;
+    }
+    .mw-content h1 {
+      font-size: 2em;
+      border-bottom: 1px solid #a2a9b1;
+      margin-top: 0;
+      margin-bottom: 0.5em;
+    }
+    .mw-content h2 {
+      font-size: 1.3em;
+      border-bottom: 1px solid #c8ccd1;
+      margin-top: 2em;
+      margin-bottom: 0.5em;
+    }
+    .mw-content a {
+      color: #0645ad;
+      text-decoration: none;
+    }
+    .mw-content a:hover {
+      text-decoration: underline;
+    }
+    .reference {
+      font-size: 0.9em;
+    }
+    .mw-content ul {
+      padding-left: 1.5em;
+    }
+    .categories {
+      margin-top: 3em;
+      font-size: 0.9em;
+      color: #555;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+    .mw-tools {
+      width: 180px;
+      font-size: 0.95em;
+      color: #222;
+      margin-left: 2em;
+      min-width: 140px;
+    }
+    .mw-tools h3 {
+      font-size: 1.1em;
+      margin: 0.5em 0 0.2em 0;
+      font-weight: bold;
+      border-bottom: 1px solid #c8ccd1;
+      padding-bottom: 0.2em;
+    }
+    .mw-tools ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1em 0;
+    }
+    .mw-tools li {
+      margin: 0.3em 0;
+    }
+    .mw-tools a {
+      color: #0645ad;
+      text-decoration: none;
+    }
+    .mw-tools a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 1100px) {
+      .mw-sidebar, .mw-tools {
+        display: none;
+      }
+      .mw-content {
+        padding: 1em;
+      }
+      .mw-container {
+        padding: 1em 0.2em;
+      }
+      .mw-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+      }
+      .logo {
+        text-align: center;
+        font-size: 1.2em;
+        margin-bottom: 0.3em;
+      }
+      .search {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 0.3em 0;
+      }
+      .mw-header .user, #nightModeBtn {
+        display: inline-block;
+        text-align: right;
+        margin: 0.2em 0.2em 0.2em 0;
+      }
+      .sidebar-toggle {
+        display: block;
+        position: fixed;
+        left: 10px;
+        top: 10px;
+        z-index: 300;
+        background: #fff;
+        border: 1px solid #a2a9b1;
+        border-radius: 3px;
+        padding: 0.3em 0.8em;
+        cursor: pointer;
+        font-size: 1em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      }
+    }
+    @media (max-width: 1100px) {
+      .mw-sidebar.sidebar-open {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 60px;
+        width: 80vw;
+        max-width: 350px;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+        z-index: 200;
+        background: #fff;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+    }
+    .mw-sidebar .active {
+      background: #eaf3ff;
+      font-weight: bold;
+      border-left: 3px solid #36c;
+      padding-left: 0.5em;
+    }
+    .mw-tools.sticky {
+      position: sticky;
+      top: 70px;
+    }
+    .night-mode {
+      background: #222 !important;
+      color: #e0e0e0 !important;
+    }
+    .night-mode .mw-content, .night-mode .mw-header, .night-mode .mw-sidebar, .night-mode .mw-tools {
+      background: #232629 !important;
+      color: #e0e0e0 !important;
+      box-shadow: none !important;
+    }
+    .night-mode a { color: #7abaff !important; }
+    .night-mode .categories { border-top: 1px solid #444 !important; color: #aaa !important; }
+    .night-mode .infobox {
+      background: #232629 !important;
+      border: 1px solid #444 !important;
+      color: #e0e0e0 !important;
+    }
+    .night-mode .infobox-title {
+      background: #a12d2d !important;
+      color: #fff !important;
+    }
+    .night-mode .infobox-table th {
+      background: #232629 !important;
+      color: #b0b0b0 !important;
+    }
+    .night-mode .infobox-table td {
+      color: #e0e0e0 !important;
+    }
+    .night-mode .infobox-table a {
+      color: #7abaff !important;
+    }
+    .font-small { font-size: 0.95em; }
+    .font-normal { font-size: 1.05em; }
+    .font-large { font-size: 1.18em; }
+    .infobox {
+      float: right;
+      width: 270px;
+      margin: 0 0 1.5em 2em;
+      background: #f8f9fa;
+      border: 1px solid #a2a9b1;
+      border-radius: 3px;
+      font-size: 0.98em;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .infobox-title {
+      background: #b32424;
+      color: #fff;
+      font-weight: bold;
+      text-align: center;
+      padding: 0.7em 0.5em;
+      font-size: 1.15em;
+      letter-spacing: 1px;
+    }
+    .infobox-img {
+      width: 100%;
+      display: block;
+      margin: 0 auto 0.5em auto;
+      border-bottom: 1px solid #ddd;
+    }
+    .infobox-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+    .infobox-table th, .infobox-table td {
+      padding: 0.4em 0.7em;
+      border: none;
+      text-align: left;
+      vertical-align: top;
+    }
+    .infobox-table th {
+      color: #555;
+      width: 32%;
+      font-weight: normal;
+      background: #f3f3f3;
+    }
+    @media (max-width: 900px) {
+      .infobox {
+        display: none;
+      }
+    }
+    .night-btn {
+      margin-left: 1em;
+      padding: 0.4em 1.2em;
+      border: 1px solid #a2a9b1;
+      border-radius: 4px;
+      background: #fff;
+      color: #222;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .night-btn:hover {
+      background: #eaf3ff;
+      color: #0645ad;
+    }
+    @media (max-width: 1100px) {
+      .night-btn {
+        display: block;
+        width: 60%;
+        margin: 0.5em auto 0.2em auto;
+        font-size: 0.92em;
+        padding: 0.35em 0;
+        box-sizing: border-box;
+        border-radius: 5px;
+        letter-spacing: 0.2px;
+      }
+    }
+    .sidebar-night-btn-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2em;
+      margin-bottom: 1em;
+    }
+    .mw-sidebar .night-btn {
+      width: 80%;
+      font-size: 1em;
+      padding: 0.5em 0;
+      border-radius: 6px;
+      margin: 0 auto;
+      display: block;
+    }
+    @media (max-width: 1100px) {
+      .mw-sidebar .night-btn {
+        width: 90%;
+        font-size: 0.95em;
+        padding: 0.35em 0;
+        border-radius: 5px;
+      }
+      .sidebar-night-btn-wrap {
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="sidebar-toggle" style="display:none;">☰ 目录</button>
+  <div class="mw-header">
+    <span class="logo">维基百科</span>
+    <span class="search"><input type="text" id="searchBox" placeholder="搜索维基百科..." /></span>
+  </div>
+  <div class="mw-container">
+    <nav class="mw-sidebar">
+      <h3>目录</h3>
+      <ul>
+        <li><a href="#名称由来">名称由来</a></li>
+        <li><a href="#发展历程">发展历程</a></li>
+        <li><a href="#近期动态">近期动态</a></li>
+        <li><a href="#参考资料">参考资料</a></li>
+        <li><a href="#外部链接">外部链接</a></li>
+      </ul>
+      <div class="sidebar-night-btn-wrap">
+        <button id="nightModeBtn" class="night-btn">夜间模式</button>
+      </div>
+    </nav>
+    <main class="mw-content font-normal" id="mainContent">
+      <div class="infobox">
+        <div class="infobox-title">BigJackson</div>
+        <img src="/img/1.jpg" alt="BigJackson照片" class="infobox-img">
+        <table class="infobox-table">
+          <tr><th>中文名</th><td>大杰克森</td></tr>
+          <tr><th>国籍</th><td>中国大陆</td></tr>
+          <tr><th>职业</th><td>UP主、YouTuber</td></tr>
+          <tr><th>活跃平台</th><td><a href="https://www.youtube.com/@CNBigJackson" target="_blank">YouTube主页</a> <a href="https://space.bilibili.com/1549550569" target="_blank">Bilibili主页</a></td></tr>
+          <tr><th>代表作品</th><td><a href="https://www.bilibili.com/video/BV1Au4y1y7dd" target="_blank">《比格鹿，它使您的桌面更清洁》</a></td></tr>
+        </table>
+      </div>
+      <h1>BigJackson</h1>
+      <p><strong>BigJackson</strong> 是中国大陆一位活跃于 <a href="https://space.bilibili.com/1549550569" target="_blank">哔哩哔哩</a>（B站）科技区的内容创作者，也在 <a href="https://www.youtube.com/@CNBigJackson" target="_blank">YouTube</a> 平台发布视频。其创作内容主要涉及桌面美化、科技类软件推荐及相关教程。</p>
+      <p>2023年9月，该频道发布的视频《比格鹿，它使您的桌面更清洁》登上热门榜单，被部分科技类UP主转载评论。<span class="reference"><a href="https://www.bilibili.com/video/BV1Au4y1y7dd" target="_blank">[1]</a></span></p>
+      <h2 id="名称由来">名称由来</h2>
+      <p>“BigJackson”是其在多个视频平台上使用的网络昵称，该名称最早见于其在B站的个人主页。</p>
+      <h2 id="发展历程">发展历程</h2>
+      <p>2023年9月4日，BigJackson发布了视频 <a href="https://www.bilibili.com/video/BV1Au4y1y7dd" target="_blank">《比格鹿，它使您的桌面更清洁》</a>，该视频于9月6日进入B站热门榜单，成为其早期获得广泛关注的代表作品。</p>
+      <p>2023年9月5日，其B站账号粉丝数量突破1000人；随后在10月9日，总播放量突破5000万次。</p>
+      <p>2023年10月22日，他发布视频 <a href="https://www.bilibili.com/video/BV1fu4y1p7Fv" target="_blank">《一起充电！！！》</a>，成为其第二个进入热门榜单的视频。</p>
+      <p>10月23日，粉丝数量突破5000人，并于10月29日突破1万人。11月17日，其频道累计播放量突破1亿次。</p>
+      <h2 id="近期动态">近期动态</h2>
+      <p>截至2024年起，BigJackson在B站的更新频率有所下降，并逐步将视频创作重心转向YouTube平台。</p>
+      <h2 id="参考资料">参考资料</h2>
+      <ul>
+        <li><a href="https://bigjackson.top" target="_blank">BigJackson的个人博客</a></li>
+      </ul>
+      <h2 id="外部链接">外部链接</h2>
+      <ul>
+        <li><a href="https://space.bilibili.com/1549550569" target="_blank">BigJackson的Bilibili主页</a></li>
+        <li><a href="https://www.youtube.com/@CNBigJackson" target="_blank">YouTube主页</a></li>
+      </ul>
+      <div class="categories">
+        <strong>分类：</strong>
+        <a href="#">中国大陆网络红人</a> |
+        <a href="#">哔哩哔哩UP主</a> |
+        <a href="#">YouTube用户（中国大陆）</a>
+      </div>
+    </main>
+    <aside class="mw-tools" id="toolsBar">
+      <h3>工具</h3>
+      <ul>
+        <li>常规</li>
+        <li><a href="#">链入页面</a></li>
+        <li><a href="#">相关更改</a></li>
+        <li><a href="#">用户贡献</a></li>
+        <li><a href="#">全域贡献</a></li>
+        <li><a href="#">日志</a></li>
+        <li><a href="#">邮件联系</a></li>
+        <li><a href="#">屏蔽设置</a></li>
+        <li><a href="#">查看用户组</a></li>
+        <li><a href="#">上传文件</a></li>
+        <li><a href="#">页面信息</a></li>
+        <li><a href="#">获取短链接</a></li>
+        <li><a href="#">下载二维码</a></li>
+        <li><a href="#">全部展开</a></li>
+      </ul>
+      <h3>外观</h3>
+      <ul>
+        <li>文本
+          <ul style="margin-left:1em;">
+            <li><button class="font-btn" data-size="small">小</button></li>
+            <li><button class="font-btn" data-size="normal">标准</button></li>
+            <li><button class="font-btn" data-size="large">大</button></li>
+          </ul>
+        </li>
+        <li>宽度
+          <ul style="margin-left:1em;">
+            <li>标准</li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+  </div>
+  <script>
+  // 1. 目录锚点跳转与高亮
+  const sidebar = document.querySelector('.mw-sidebar ul');
+  const sidebarLinks = sidebar.querySelectorAll('a');
+  const sectionIds = Array.from(sidebarLinks).map(a => decodeURIComponent(a.getAttribute('href').slice(1)));
+  const sections = sectionIds.map(id => document.getElementById(id) || document.querySelector(`[id='${id}']`));
+  function highlightSidebar() {
+    let idx = 0;
+    for (let i = 0; i < sections.length; i++) {
+      if (sections[i]) {
+        const rect = sections[i].getBoundingClientRect();
+        if (rect.top - 80 < 0) idx = i;
+      }
+    }
+    sidebarLinks.forEach((a, i) => a.classList.toggle('active', i === idx));
+  }
+  window.addEventListener('scroll', highlightSidebar);
+  highlightSidebar();
+
+  // 2. 目录折叠/展开（移动端）
+  const sidebarNav = document.querySelector('.mw-sidebar');
+  const sidebarToggle = document.querySelector('.sidebar-toggle');
+  function checkSidebarToggle() {
+    if (window.innerWidth <= 1100) {
+      sidebarToggle.style.display = 'block';
+      sidebarNav.classList.remove('sidebar-open');
+    } else {
+      sidebarToggle.style.display = 'none';
+      sidebarNav.classList.remove('sidebar-open');
+    }
+  }
+  sidebarToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = sidebarNav.classList.contains('sidebar-open');
+    if (isOpen) {
+      sidebarNav.classList.remove('sidebar-open');
+    } else {
+      sidebarNav.classList.add('sidebar-open');
+    }
+  });
+  // 点击空白处关闭目录（仅移动端）
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 1100 && sidebarNav.classList.contains('sidebar-open')) {
+      // 如果点击的不是sidebar和不是按钮
+      if (!sidebarNav.contains(e.target) && !sidebarToggle.contains(e.target)) {
+        sidebarNav.classList.remove('sidebar-open');
+      }
+    }
+  });
+  window.addEventListener('resize', checkSidebarToggle);
+  checkSidebarToggle();
+
+  // 3. 右侧工具栏吸顶
+  const toolsBar = document.getElementById('toolsBar');
+  function stickyTools() {
+    if (window.innerWidth > 1100) {
+      toolsBar.classList.add('sticky');
+    } else {
+      toolsBar.classList.remove('sticky');
+    }
+  }
+  window.addEventListener('resize', stickyTools);
+  stickyTools();
+
+  // 4. 顶部搜索框高亮内容
+  const searchBox = document.getElementById('searchBox');
+  const mainContent = document.getElementById('mainContent');
+  let lastHighlights = [];
+  function removeHighlights() {
+    lastHighlights.forEach(span => {
+      const parent = span.parentNode;
+      parent.replaceChild(document.createTextNode(span.textContent), span);
+      parent.normalize();
+    });
+    lastHighlights = [];
+  }
+  function highlightText(keyword) {
+    removeHighlights();
+    if (!keyword) return;
+    const walker = document.createTreeWalker(mainContent, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue.trim() && node.nodeValue.includes(keyword)) {
+        const idx = node.nodeValue.indexOf(keyword);
+        const before = node.nodeValue.slice(0, idx);
+        const match = node.nodeValue.slice(idx, idx + keyword.length);
+        const after = node.nodeValue.slice(idx + keyword.length);
+        const span = document.createElement('span');
+        span.textContent = match;
+        span.style.background = '#ffe564';
+        span.style.color = '#222';
+        span.style.borderRadius = '2px';
+        span.style.padding = '0 2px';
+        node.parentNode.insertBefore(document.createTextNode(before), node);
+        node.parentNode.insertBefore(span, node);
+        node.nodeValue = after;
+        lastHighlights.push(span);
+      }
+    }
+  }
+  searchBox.addEventListener('input', e => {
+    highlightText(e.target.value.trim());
+  });
+
+  // 5. 外观切换（字体大小）
+  const fontBtns = document.querySelectorAll('.font-btn');
+  fontBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      mainContent.classList.remove('font-small', 'font-normal', 'font-large');
+      if (btn.dataset.size === 'small') mainContent.classList.add('font-small');
+      else if (btn.dataset.size === 'normal') mainContent.classList.add('font-normal');
+      else if (btn.dataset.size === 'large') mainContent.classList.add('font-large');
+    });
+  });
+
+  // 6. 夜间模式切换
+  const nightBtn = document.getElementById('nightModeBtn');
+  nightBtn.addEventListener('click', () => {
+    document.body.classList.toggle('night-mode');
+    nightBtn.textContent = document.body.classList.contains('night-mode') ? '日间模式' : '夜间模式';
+  });
+  </script>
+</body>
+</html>
